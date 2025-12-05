@@ -1,5 +1,12 @@
 # 114-1 BME LAB Final Project - 腦機介面遊戲控制系統
 
+> **語言版本選擇 / Language Selection**
+> 
+> - 🇹🇼 [繁體中文 (Traditional Chinese)](Readme_chinese.md) ← 當前版本
+> - 🇺🇸 [English](Readme.md)
+> 
+> 您也可以點擊 README 標題旁的 📝 圖示查看歷史版本，或使用 GitHub 的分支/標籤功能切換到不同版本。
+
 ## 專案概述
 
 本專案實現了一個基於 EEG（腦電圖）信號的遊戲控制系統，使用 CTNet（Convolution-Transformer Network）模型對腦電信號進行即時分類，並將分類結果轉換為遊戲控制指令。系統包含三個主要模組：
