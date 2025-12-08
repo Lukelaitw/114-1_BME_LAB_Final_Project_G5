@@ -158,15 +158,12 @@ python main.py
 
 ![最佳分類結果](Classifier/asset/bci_results_best.png)
 
-#### 不同訓練輪數的結果比較
+#### 不同訓練設定的結果比較
 
 **Base 模型（100 epochs）**
 
 ![Base 模型結果](Classifier/asset/bci_results_data_base_e100.png)
 
-**Extended 模型（1000 epochs）**
-
-![Extended 模型結果](Classifier/asset/bci_results_data_e1000.png)
 
 **Base 模型（18 位受試者，來自 [114-1_BME_Exp3_group_5](https://github.com/Lukelaitw/114-1_BME_Exp3_group_5)）**
 

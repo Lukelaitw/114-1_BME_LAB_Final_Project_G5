@@ -158,15 +158,12 @@ This project uses the CTNet (Convolution-Transformer Network) model for EEG sign
 
 ![Best Classification Results](Classifier/asset/bci_results_best.png)
 
-#### Comparison of Results with Different Training Epochs
+#### Comparison of Results with Different Settings
 
 **Base Model (100 epochs)**
 
 ![Base Model Results](Classifier/asset/bci_results_data_base_e100.png)
 
-**Extended Model (1000 epochs)**
-
-![Extended Model Results](Classifier/asset/bci_results_data_e1000.png)
 
 **Base Model (18 subjects from [114-1_BME_Exp3_group_5](https://github.com/Lukelaitw/114-1_BME_Exp3_group_5))**
 
