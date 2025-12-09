@@ -1,4 +1,11 @@
-# Fist time: from the project root
+# Balance Game Usage Guide
+
+> **Language Selection / 語言版本選擇**
+> 
+> - 🇺🇸 [English](README.md) ← Current version
+> - 🇹🇼 [繁體中文 (Traditional Chinese)](README_chinese.md)
+
+## First Time: From the Project Root
 
 ```
 source .venv/bin/activate
@@ -81,27 +88,26 @@ The socket layer stacks with the keyboard and blink input, so you can fall back 
 
 ## Blink energy training + BrainLink bridge
 
-1. **Derive an energy profile（一次即可）**
+1. **Derive an energy profile (one-time setup)**
 
-   ```
+   ```bash
    python tools/train_blink_energy.py \
        --datasets ~/Downloads/BME_Lab_BCI_training/bci_dataset_114-1 \
                  ~/Downloads/BME_Lab_BCI_training/bci_dataset_113-2 \
        --output assets/blink_energy_profile.json
    ```
 
-   這會讀取各受試者的 `S*/3.txt`（含 20 秒睜眼／20 秒閉眼循環），計算開眼與閉眼的能量分佈並輸出
-   建議的能量閾值。結果會寫進 `assets/blink_energy_profile.json`，後續橋接程式與即時偵測會自動讀取。
+   This reads each subject's `S*/3.txt` (containing 20-second open/20-second closed eye cycles), calculates the energy distribution of open and closed eyes, and outputs suggested energy thresholds. Results are written to `assets/blink_energy_profile.json`, which subsequent bridge programs and real-time detection will automatically read.
 
-2. **啟動遊戲的 socket listener**
+2. **Start the game's socket listener**
 
-   ```
+   ```bash
    python main.py --socket-input
    ```
 
-3. **執行 BrainLink → 模型 → 遊戲的橋接腳本**
+3. **Execute BrainLink → Model → Game bridge script**
 
-   ```
+   ```bash
    python tools/brainlink_socket_bridge.py \
        --thinkgear-host 127.0.0.1 --thinkgear-port 13854 \
        --game-port 4789 \
@@ -109,38 +115,69 @@ The socket layer stacks with the keyboard and blink input, so you can fall back 
        --model-module your_ml_module
    ```
 
-   - `--profile` 指向上一部產生的能量設定，會驅動 `EnergyBlinkDetector` 讀取 raw EEG（需先開啟 ThinkGear Connector）。
-   - `--model-module` 是選填的 Python 模組，需提供 `predict(packet: dict) -> dict`，可以在裡面載入同學的專注/放鬆模型並輸出
-     `{"lean": …, "jump": …}`。若未指定，預設用冥想值對應傾斜，眨眼則由能量檢測決定。
-   - 若你的模型也要外送 JSON，可直接在 `predict` 回傳字典即可。
+   - `--profile` points to the energy settings generated in the previous step, which drives `EnergyBlinkDetector` to read raw EEG (requires ThinkGear Connector to be started first).
+   - `--model-module` is an optional Python module that needs to provide `predict(packet: dict) -> dict`, where you can load your focus/relaxation model and output `{"lean": …, "jump": …}`. If not specified, it defaults to using meditation value for lean, and blink is determined by energy detection.
+   - If your model also needs to output JSON, you can directly return a dictionary from `predict`.
 
-4. 桥接腳本會把每次眨眼（能量短暫下降）轉成 `{"jump": true}` 的 JSON 指令送進遊戲的 socket。
-   你也可以在自訂模組中利用 `packet["rawEeg"]` 自行處理特徵。
+4. The bridge script converts each blink (brief energy drop) into a `{"jump": true}` JSON command sent to the game's socket. You can also use `packet["rawEeg"]` in your custom module to process features yourself.
 
-## 直接用 BrainLinkParser 連 BrainLink（不用 ThinkGear Connector）
+## Direct Connection to BrainLink Using BrainLinkParser (Without ThinkGear Connector)
 
-1. 安裝需求（只需一次）：
+1. **Install requirements (one-time)**:
    ```bash
    source .venv/bin/activate
    pip install -r requirements.txt
    ```
-2. 用 `ls /dev/cu.*` 找到 BrainLink 的序列埠（例如 `/dev/cu.BrainLink_Lite`）。
-3. 啟動遊戲 socket：
+
+2. **Find BrainLink's serial port**: Use `ls /dev/cu.*` to find BrainLink's serial port (e.g., `/dev/cu.BrainLink_Lite`).
+
+3. **Start game socket**:
    ```bash
    python main.py --socket-input
    ```
-4. 使用 `tools/brainlink_serial_bridge.py` 直接解析 BrainLink 的串列資料並送進遊戲：
+
+4. **Use `tools/brainlink_serial_bridge.py` to directly parse BrainLink's serial data and send to game**:
    ```bash
    python tools/brainlink_serial_bridge.py \
        --serial-port /dev/cu.BrainLink_Lite \
        --profile assets/blink_energy_profile.json \
        --game-port 4789 \
        --verbose \
-       --model-module your_ml_module   # 若沒有可省略
+       --model-module your_ml_module   # Optional if not available
    ```
 
-   - 腦波 raw 資料會經 `EnergyBlinkDetector` 做能量尖峰偵測 → 觸發 jump。
-   - `--model-module` 可定義 `predict(packet: dict) -> dict`，回傳 `{"lean": …}` 等欄位；未指定時預設用 attention 值轉 lean。
-   - 沒有 profile 時會 fallback 用 `blinkStrength >= threshold` 判斷眨眼。
+   - Raw EEG data goes through `EnergyBlinkDetector` for energy spike detection → triggers jump.
+   - `--model-module` can define `predict(packet: dict) -> dict`, returning fields like `{"lean": …}`; if not specified, defaults to using attention value for lean.
+   - Without profile, it falls back to using `blinkStrength >= threshold` to detect blinks.
 
-> 如果橋接程式顯示 `Connection refused`，代表你還沒啟動 `python main.py --socket-input`；請先開遊戲 socket 再啟橋接。
+> If the bridge program shows `Connection refused`, it means you haven't started `python main.py --socket-input` yet; please start the game socket first, then start the bridge.
+
+## Keyboard Controls
+
+When the game is running, you can use the following keyboard controls:
+
+- `A` / `←`: Lean left
+- `D` / `→`: Lean right
+- `Space` / `↑`: Jump
+
+## Troubleshooting
+
+### Connection Refused
+
+If you see `Connection refused` error:
+
+1. Confirm the game is started and using `--socket-input` parameter
+2. Confirm the port number is correct (default 4789)
+3. Check firewall settings
+
+### Cannot Detect Blinks
+
+1. Confirm BrainLink device is properly connected
+2. Check if `blink_energy_profile.json` exists
+3. Adjust `--blink-threshold` parameter
+
+## Related Files
+
+- [Project Main README](../README.md)
+- [Game Control Integration Guide](../server_client/GAME_CONTROL_README.md)
+- [BrainLink Usage Guide](../brainlink/README_USAGE.md)
