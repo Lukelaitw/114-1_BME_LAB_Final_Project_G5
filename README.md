@@ -2,18 +2,19 @@
 
 > **Language Selection / 語言版本選擇**
 > 
-> - 🇺🇸 [English](Readme.md) ← Current version
-> - 🇹🇼 [繁體中文 (Traditional Chinese)](Readme_chinese.md)
+> - 🇺🇸 [English](README.md) ← Current version
+> - 🇹🇼 [繁體中文 (Traditional Chinese)](README_chinese.md)
 > 
 > You can also click the 📝 icon next to the README title to view history, or use GitHub's branch/tag feature to switch between versions.
 
 ## Project Overview
 
-This project implements a game control system based on EEG (electroencephalography) signals, using the CTNet (Convolution-Transformer Network) model for real-time classification of brain signals and converting classification results into game control commands. The system consists of three main modules:
+This project implements a game control system based on EEG (electroencephalography) signals, using the CTNet (Convolution-Transformer Network) model for real-time classification of brain signals and converting classification results into game control commands. The system consists of four main modules:
 
 1. **Balance Game** (`balance_game/`): A tightrope balance game supporting multiple input methods
 2. **EEG Classifier** (`Classifier/`): Uses CTNet model for EEG signal classification (relaxed/focused)
 3. **Real-time Server** (`server_client/`): Receives BIOPAC EEG data, performs real-time classification, and controls the game
+4. **BrainLink Integration** (`brainlink/`): Reads raw EEG data from BrainLink devices, performs classification, and controls the game
 
 ## Project Structure
 
@@ -44,14 +45,22 @@ This project implements a game control system based on EEG (electroencephalograp
 │   ├── plot_figures/         # Result visualization scripts
 │   └── README.md             # Classifier documentation
 │
-└── server_client/             # Real-time server module
-    ├── eeg_server_ctnet.py   # EEG server main program
-    ├── inference.py          # Inference module
-    ├── loso.py              # CTNet model
-    ├── utils.py             # Utility functions
-    ├── test_game_control.py # Game control testing
-    ├── Loso_C_heads_2_depth_8_0/  # Model files
-    └── GAME_CONTROL_README.md    # Game control documentation
+├── server_client/             # Real-time server module
+│   ├── eeg_server_ctnet.py   # EEG server main program
+│   ├── inference.py          # Inference module
+│   ├── loso.py              # CTNet model
+│   ├── utils.py             # Utility functions
+│   ├── test_game_control.py # Game control testing
+│   ├── Loso_C_heads_2_depth_8_0/  # Model files
+│   └── GAME_CONTROL_README.md    # Game control documentation
+│
+└── brainlink/                # BrainLink integration module
+    ├── brainlink_raw.py      # Full version with CTNet classifier
+    ├── brainlink_woClassifier.py  # Without classifier, uses Attention/Meditation directly
+    ├── eeg_server_ctnet.py   # EEG server (reference implementation)
+    ├── test.ipynb           # Test notebook
+    ├── asset/               # Resource files
+    └── README_USAGE.md      # BrainLink usage documentation
 ```
 
 ## Installation
@@ -70,6 +79,7 @@ source .venv/bin/activate  # macOS/Linux
 # Install dependencies
 pip install -r balance_game/requirements.txt
 pip install torch torchvision numpy pandas matplotlib seaborn scikit-learn einops
+pip install cushy-serial  # Required for BrainLink serial communication
 ```
 
 ### 2. Compile Game Module
@@ -115,7 +125,46 @@ The server will:
 
 ### Other Usage Methods
 
-#### Direct Control with BrainLink
+#### Method 1: BrainLink + CTNet Classifier (Recommended)
+
+Read raw EEG data from BrainLink device and classify using CTNet model:
+
+```bash
+# Terminal 1: Start game
+cd balance_game
+python main.py --socket-input --socket-port 4789
+
+# Terminal 2: Start BrainLink reader and classifier (from project root)
+python brainlink/brainlink_raw.py --serial-port /dev/cu.BrainLink_Pro
+```
+
+**Windows:**
+```bash
+python brainlink/brainlink_raw.py --serial-port COM3
+```
+
+**Features:**
+- Reads raw EEG data from BrainLink
+- Real-time classification using CTNet model (relaxed/focused)
+- Automatic blink detection
+- Sends control signals to game
+
+For detailed instructions, see: [BrainLink Usage Guide](brainlink/README_USAGE.md)
+
+#### Method 2: BrainLink (Without Classifier)
+
+Directly use BrainLink's Attention/Meditation values to control the game:
+
+```bash
+# Terminal 1: Start game
+cd balance_game
+python main.py --socket-input --socket-port 4789
+
+# Terminal 2: Start BrainLink (from project root)
+python brainlink/brainlink_woClassifier.py --serial-port /dev/cu.BrainLink_Pro
+```
+
+#### Method 3: BrainLink Bridge (Legacy Method)
 
 ```bash
 # Terminal 1: Start game
@@ -143,6 +192,7 @@ Controls:
 For detailed instructions, please refer to each module's README:
 - [Game Usage Instructions](balance_game/README.md)
 - [Game Control Integration Guide](server_client/GAME_CONTROL_README.md)
+- [BrainLink Usage Guide](brainlink/README_USAGE.md)
 
 ## Classifier Results
 

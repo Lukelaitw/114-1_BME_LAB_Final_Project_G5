@@ -1,5 +1,10 @@
 # CTNet EEG 分類器
 
+> **語言版本選擇 / Language Selection**
+> 
+> - 🇹🇼 [繁體中文 (Traditional Chinese)](README.md) ← 當前版本
+> - 🇺🇸 [English](README_EN.md)
+
 ## 專案概述
 
 本模組實現了基於 CTNet (Convolution-Transformer Network) 的 EEG 信號分類系統，用於區分「專注」與「放鬆」兩種腦電狀態。採用 Leave-One-Subject-Out (LOSO) 交叉驗證方法，在 35 位受試者的數據集上進行訓練與評估。

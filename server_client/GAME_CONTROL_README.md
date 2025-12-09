@@ -1,5 +1,10 @@
 # 遊戲控制整合說明
 
+> **語言版本選擇 / Language Selection**
+> 
+> - 🇹🇼 [繁體中文 (Traditional Chinese)](GAME_CONTROL_README.md) ← 當前版本
+> - 🇺🇸 [English](GAME_CONTROL_README_EN.md)
+
 這個專案已整合了將 EEG 預測狀態傳輸到遊戲的功能。
 
 ## 功能概述

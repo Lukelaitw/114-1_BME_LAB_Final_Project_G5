@@ -1,5 +1,10 @@
 # CTNet EEG Classifier
 
+> **Language Selection / 語言版本選擇**
+> 
+> - 🇺🇸 [English](README_EN.md) ← Current version
+> - 🇹🇼 [繁體中文 (Traditional Chinese)](README.md)
+
 ## Project Overview
 
 This module implements an EEG signal classification system based on CTNet (Convolution-Transformer Network) to distinguish between "focused" and "relaxed" brain states. It employs Leave-One-Subject-Out (LOSO) cross-validation for training and evaluation on a dataset of 35 subjects.

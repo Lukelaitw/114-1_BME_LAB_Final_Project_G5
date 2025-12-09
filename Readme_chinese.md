@@ -2,18 +2,19 @@
 
 > **語言版本選擇 / Language Selection**
 > 
-> - 🇹🇼 [繁體中文 (Traditional Chinese)](Readme_chinese.md) ← 當前版本
-> - 🇺🇸 [English](Readme.md)
+> - 🇹🇼 [繁體中文 (Traditional Chinese)](README_chinese.md) ← 當前版本
+> - 🇺🇸 [English](README.md)
 > 
 > 您也可以點擊 README 標題旁的 📝 圖示查看歷史版本，或使用 GitHub 的分支/標籤功能切換到不同版本。
 
 ## 專案概述
 
-本專案實現了一個基於 EEG（腦電圖）信號的遊戲控制系統，使用 CTNet（Convolution-Transformer Network）模型對腦電信號進行即時分類，並將分類結果轉換為遊戲控制指令。系統包含三個主要模組：
+本專案實現了一個基於 EEG（腦電圖）信號的遊戲控制系統，使用 CTNet（Convolution-Transformer Network）模型對腦電信號進行即時分類，並將分類結果轉換為遊戲控制指令。系統包含四個主要模組：
 
 1. **平衡遊戲** (`balance_game/`)：一個走鋼索平衡遊戲，支援多種輸入方式
 2. **EEG 分類器** (`Classifier/`)：使用 CTNet 模型進行腦電信號分類（放鬆/專注）
 3. **即時服務器** (`server_client/`)：接收 BIOPAC EEG 數據，進行即時分類並控制遊戲
+4. **BrainLink 整合** (`brainlink/`)：從 BrainLink 設備讀取原始 EEG 數據，進行分類並控制遊戲
 
 ## 專案結構
 
@@ -44,14 +45,22 @@
 │   ├── plot_figures/         # 結果視覺化腳本
 │   └── README.md             # 分類器說明
 │
-└── server_client/             # 即時服務器模組
-    ├── eeg_server_ctnet.py   # EEG 服務器主程式
-    ├── inference.py          # 推理模組
-    ├── loso.py              # CTNet 模型
-    ├── utils.py             # 工具函數
-    ├── test_game_control.py # 遊戲控制測試
-    ├── Loso_C_heads_2_depth_8_0/  # 模型文件
-    └── GAME_CONTROL_README.md    # 遊戲控制說明
+├── server_client/             # 即時服務器模組
+│   ├── eeg_server_ctnet.py   # EEG 服務器主程式
+│   ├── inference.py          # 推理模組
+│   ├── loso.py              # CTNet 模型
+│   ├── utils.py             # 工具函數
+│   ├── test_game_control.py # 遊戲控制測試
+│   ├── Loso_C_heads_2_depth_8_0/  # 模型文件
+│   └── GAME_CONTROL_README.md    # 遊戲控制說明
+│
+└── brainlink/                # BrainLink 整合模組
+    ├── brainlink_raw.py      # 使用 CTNet 分類器的完整版本
+    ├── brainlink_woClassifier.py  # 不使用分類器，直接使用 Attention/Meditation
+    ├── eeg_server_ctnet.py   # EEG 服務器（參考實現）
+    ├── test.ipynb           # 測試筆記本
+    ├── asset/               # 資源文件
+    └── README_USAGE.md      # BrainLink 使用說明
 ```
 
 ## 安裝說明
@@ -70,6 +79,7 @@ source .venv/bin/activate  # macOS/Linux
 # 安裝依賴
 pip install -r balance_game/requirements.txt
 pip install torch torchvision numpy pandas matplotlib seaborn scikit-learn einops
+pip install cushy-serial  # BrainLink 串口通訊所需
 ```
 
 ### 2. 編譯遊戲模組
@@ -115,7 +125,46 @@ python eeg_server_ctnet.py
 
 ### 其他使用方式
 
-#### 使用 BrainLink 直接控制
+#### 方式 1：使用 BrainLink + CTNet 分類器（推薦）
+
+使用 BrainLink 設備讀取原始 EEG 數據，透過 CTNet 模型進行分類：
+
+```bash
+# 終端 1：啟動遊戲
+cd balance_game
+python main.py --socket-input --socket-port 4789
+
+# 終端 2：啟動 BrainLink 讀取與分類（從專案根目錄執行）
+python brainlink/brainlink_raw.py --serial-port /dev/cu.BrainLink_Pro
+```
+
+**Windows 系統**：
+```bash
+python brainlink/brainlink_raw.py --serial-port COM3
+```
+
+**功能特點**：
+- 從 BrainLink 讀取原始 EEG 數據
+- 使用 CTNet 模型進行即時分類（放鬆/專注）
+- 自動偵測眨眼動作
+- 將控制信號發送到遊戲
+
+詳細說明請參考：[BrainLink 使用說明](brainlink/README_USAGE.md)
+
+#### 方式 2：使用 BrainLink（不使用分類器）
+
+直接使用 BrainLink 的 Attention/Meditation 值控制遊戲：
+
+```bash
+# 終端 1：啟動遊戲
+cd balance_game
+python main.py --socket-input --socket-port 4789
+
+# 終端 2：啟動 BrainLink（從專案根目錄執行）
+python brainlink/brainlink_woClassifier.py --serial-port /dev/cu.BrainLink_Pro
+```
+
+#### 方式 3：使用 BrainLink 橋接（舊版方法）
 
 ```bash
 # 終端 1：啟動遊戲
@@ -143,6 +192,7 @@ python main.py
 詳細說明請參考各模組的 README：
 - [遊戲使用說明](balance_game/README.md)
 - [遊戲控制整合說明](server_client/GAME_CONTROL_README.md)
+- [BrainLink 使用說明](brainlink/README_USAGE.md)
 
 ## Classifier 結果
 
