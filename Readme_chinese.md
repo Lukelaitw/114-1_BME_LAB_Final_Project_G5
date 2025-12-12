@@ -7,6 +7,10 @@
 > 
 > 您也可以點擊 README 標題旁的 📝 圖示查看歷史版本，或使用 GitHub 的分支/標籤功能切換到不同版本。
 
+> **🌐 專案頁面 / Project Page**
+> 
+> 訪問我們的專案頁面：[https://lukelaitw.github.io/2025_Fall_NTUEE_BMELAB_Final.github.io/](https://lukelaitw.github.io/2025_Fall_NTUEE_BMELAB_Final.github.io/)
+
 ## 專案概述
 
 本專案實現了一個基於 EEG（腦電圖）信號的遊戲控制系統，使用 CTNet（Convolution-Transformer Network）模型對腦電信號進行即時分類，並將分類結果轉換為遊戲控制指令。系統包含四個主要模組：

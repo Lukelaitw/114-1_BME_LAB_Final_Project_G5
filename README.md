@@ -7,6 +7,10 @@
 > 
 > You can also click the 📝 icon next to the README title to view history, or use GitHub's branch/tag feature to switch between versions.
 
+> **🌐 Project Page / 專案頁面**
+> 
+> Visit our project page: [https://lukelaitw.github.io/2025_Fall_NTUEE_BMELAB_Final.github.io/](https://lukelaitw.github.io/2025_Fall_NTUEE_BMELAB_Final.github.io/)
+
 ## Project Overview
 
 This project implements a game control system based on EEG (electroencephalography) signals, using the CTNet (Convolution-Transformer Network) model for real-time classification of brain signals and converting classification results into game control commands. The system consists of four main modules:
